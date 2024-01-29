@@ -1,0 +1,82 @@
+import json
+import os
+from datetime import datetime
+
+# File to store expense data
+DATA_FILE = "expense_data.json"
+
+# Function to load existing data or initialize an empty data structure
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as file:
+            return json.load(file)
+    else:
+        return {"expenses": []}
+
+# Function to save data to the file
+def save_data(data):
+    with open(DATA_FILE, "w") as file:
+        json.dump(data, file, indent=2)
+
+# Function to input daily expenses
+def add_expense():
+    amount = float(input("Enter the amount spent: "))
+    description = input("Enter a brief description: ")
+    category = input("Enter the expense category: ")
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    expense = {"date": today, "amount": amount, "description": description, "category": category}
+
+    return expense
+
+# Function to view summaries of monthly expenses and category-wise expenditure
+def view_summary(data):
+    month = input("Enter the month (format: YYYY-MM) to view the summary: ")
+
+    total_expenses = 0
+    category_expenses = {}
+
+    for expense in data["expenses"]:
+        if expense["date"].startswith(month):
+            total_expenses += expense["amount"]
+
+            category = expense["category"]
+            category_expenses[category] = category_expenses.get(category, 0) + expense["amount"]
+
+    print("\nSummary for", month)
+    print("Total Expenses: $", total_expenses)
+
+    if category_expenses:
+        print("\nCategory-wise Expenditure:")
+        for category, amount in category_expenses.items():
+            print(f"{category}: ${amount}")
+    else:
+        print("\nNo expenses recorded for the given month.")
+
+# Main program
+def main():
+    data = load_data()
+
+    while True:
+        print("\nExpense Tracker Menu:")
+        print("1. Add Expense")
+        print("2. View Summary")
+        print("3. Exit")
+
+        choice = input("Enter your choice (1/2/3): ")
+
+        if choice == "1":
+            expense = add_expense()
+            data["expenses"].append(expense)
+            save_data(data)
+            print("Expense added successfully!")
+        elif choice == "2":
+            view_summary(data)
+        elif choice == "3":
+            print("Exiting Expense Tracker. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if _name_ == "_main_":
+    main()

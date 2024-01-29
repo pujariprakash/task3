@@ -1,0 +1,107 @@
+Expense Tracker Documentation
+1. Introduction
+This Python script serves as a basic expense tracker, allowing users to input and track their daily expenses. The program provides functionality to add expenses, view summaries of monthly expenses, and categorize expenditures.
+
+2. Modules and Libraries
+
+The script uses the following Python modules and libraries:
+
+json: Used for encoding and decoding JSON data, facilitating the storage and retrieval of expense data.
+
+os: Provides functions to interact with the operating system. In this script, it is used to check if a file exists.
+
+datetime: Enables working with dates and times. It is employed here to capture the current date for each expense entry.
+
+3. Constants
+DATA_FILE: A constant that stores the filename for saving and loading expense data in JSON format.
+
+4. Functions
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as file:
+            return json.load(file)
+    else:
+        return {"expenses": []}
+Purpose: Loads existing expense data from the JSON file if it exists. If the file does not exist, it initializes an empty data structure.
+
+save_data(data)
+def save_data(data):
+    with open(DATA_FILE, "w") as file:
+        json.dump(data, file, indent=2)
+Purpose: Saves the current data structure to the JSON file in a formatted (indented) manner.
+add_expense()
+def add_expense():
+    amount = float(input("Enter the amount spent: "))
+    description = input("Enter a brief description: ")
+    category = input("Enter the expense category: ")
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    expense = {"date": today, "amount": amount, "description": description, "category": category}
+
+    return expense
+Purpose: Allows the user to input details for a new expense, including the amount spent, a brief description, and the category of the expense. Returns a dictionary representing the expense.
+view_summary(data)
+def view_summary(data):
+    month = input("Enter the month (format: YYYY-MM) to view the summary: ")
+
+    total_expenses = 0
+    category_expenses = {}
+
+    for expense in data["expenses"]:
+        if expense["date"].startswith(month):
+            total_expenses += expense["amount"]
+
+            category = expense["category"]
+            category_expenses[category] = category_expenses.get(category, 0) + expense["amount"]
+
+    print("\nSummary for", month)
+    print("Total Expenses: $", total_expenses)
+
+    if category_expenses:
+        print("\nCategory-wise Expenditure:")
+        for category, amount in category_expenses.items():
+            print(f"{category}: ${amount}")
+    else:
+        print("\nNo expenses recorded for the given month.")
+Purpose: Takes the loaded expense data, prompts the user to input a month, calculates, and displays the total expenses for that month and a breakdown of expenses by category.
+
+5.Main Program
+def main():
+    data = load_data()
+
+    while True:
+        print("\nExpense Tracker Menu:")
+        print("1. Add Expense")
+        print("2. View Summary")
+        print("3. Exit")
+
+        choice = input("Enter your choice (1/2/3): ")
+
+        if choice == "1":
+            expense = add_expense()
+            data["expenses"].append(expense)
+            save_data(data)
+            print("Expense added successfully!")
+        elif choice == "2":
+            view_summary(data)
+        elif choice == "3":
+            print("Exiting Expense Tracker. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
+Purpose: The main function where the program starts execution. It loads existing data, then enters a loop presenting a menu to the user. Depending on the user's choice, it either adds an expense, views a summary, or exits the program.
+
+if name == "main": Ensures that the main() function is executed only if the script is run directly, not if it is imported as a module in another script.
+
+6. Usage
+To use the expense tracker:
+Run the script.
+Follow the menu prompts to add expenses or view summaries.
+Data is saved and loaded from the "expense_data.json" file.
+
+7. Conclusion
+
+This expense tracker provides a simple yet effective way for users to record and track their daily expenses. Users can easily add new expenses, view summaries for specific months, and categorize their expenditures. The data is stored in a JSON file for persistent storage between program runs.
